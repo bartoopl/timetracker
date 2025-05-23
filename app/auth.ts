@@ -5,6 +5,10 @@ import { compare } from "bcrypt";
 
 const prisma = new PrismaClient();
 
+if (!process.env.NEXTAUTH_SECRET) {
+  throw new Error('NEXTAUTH_SECRET is not set in environment variables');
+}
+
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
