@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 
 export async function POST(
   req: Request,
-  { params }: { params: { taskId: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -18,7 +18,7 @@ export async function POST(
 
     const task = await prisma.task.findUnique({
       where: {
-        id: params.taskId,
+        id: params.id,
         userId: session.user.id,
       },
     });
@@ -36,7 +36,7 @@ export async function POST(
 
     const updatedTask = await prisma.task.update({
       where: {
-        id: params.taskId,
+        id: params.id,
       },
       data: {
         endTime: new Date(),
