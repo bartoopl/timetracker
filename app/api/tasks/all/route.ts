@@ -23,109 +23,71 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const startDate = searchParams.get('startDate');
     const endDate = searchParams.get('endDate');
+    const clientId = searchParams.get('clientId');
 
     console.log('Raw date parameters:', { startDate, endDate });
 
-    let whereClause: any = {};
+    // Pobierz listę klientów, do których użytkownik ma dostęp
+    const userClients = await prisma.userClient.findMany({
+      where: {
+        userId: session.user.id,
+      },
+      select: {
+        clientId: true,
+      },
+    });
+
+    const allowedClientIds = userClients.map(uc => uc.clientId);
+
+    const where: any = {
+      userId: session.user.id,
+    };
 
     if (startDate && endDate) {
-      // Create UTC dates
-      const start = new Date(startDate);
-      start.setUTCHours(0, 0, 0, 0);
-      
-      const end = new Date(endDate);
-      end.setUTCHours(23, 59, 59, 999);
-
-      console.log('Processed dates:', {
-        start: start.toISOString(),
-        end: end.toISOString(),
-        startTimestamp: start.getTime(),
-        endTimestamp: end.getTime()
-      });
-
-      // Get all tasks first
-      const allTasks = await prisma.task.findMany({
-        include: {
-          user: {
-            select: {
-              name: true,
-              email: true
-            }
-          }
-        },
-        orderBy: {
-          startTime: 'desc'
-        }
-      });
-
-      console.log('All tasks:', {
-        count: allTasks.length,
-        firstTask: allTasks[0] ? {
-          startTime: allTasks[0].startTime,
-          startTimestamp: new Date(allTasks[0].startTime).getTime()
-        } : null
-      });
-
-      // Filter tasks manually
-      const filteredTasks = allTasks.filter(task => {
-        const taskStart = new Date(task.startTime);
-        return taskStart >= start && taskStart <= end;
-      });
-
-      console.log('Filtered tasks:', {
-        count: filteredTasks.length,
-        firstTask: filteredTasks[0] ? {
-          startTime: filteredTasks[0].startTime,
-          startTimestamp: new Date(filteredTasks[0].startTime).getTime()
-        } : null
-      });
-
-      // Calculate duration if not set
-      const processedTasks = filteredTasks.map(task => {
-        let duration = task.duration;
-        if (!duration && task.startTime && task.endTime) {
-          duration = new Date(task.endTime).getTime() - new Date(task.startTime).getTime();
-        }
-        return {
-          ...task,
-          duration: Number(duration) || 0
-        };
-      });
-
-      return new Response(JSON.stringify(processedTasks), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      where.startTime = {
+        gte: new Date(startDate),
+        lte: new Date(endDate),
+      };
     }
 
-    // If no date range is provided, return all tasks
+    // Jeśli użytkownik nie jest adminem, pokazuj tylko zadania dla klientów, do których ma dostęp
+    if (session.user.role !== 'ADMIN') {
+      where.clientId = {
+        in: allowedClientIds,
+      };
+    } else if (clientId) {
+      // Jeśli jest adminem i wybrano konkretnego klienta
+      where.clientId = clientId;
+    }
+
     const tasks = await prisma.task.findMany({
+      where,
       include: {
         user: {
           select: {
             name: true,
-            email: true
-          }
-        }
+            email: true,
+          },
+        },
+        client: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
       orderBy: {
-        startTime: 'desc'
-      }
+        startTime: 'desc',
+      },
     });
 
-    // Calculate duration if not set
-    const processedTasks = tasks.map(task => {
-      let duration = task.duration;
-      if (!duration && task.startTime && task.endTime) {
-        duration = new Date(task.endTime).getTime() - new Date(task.startTime).getTime();
-      }
-      return {
-        ...task,
-        duration: Number(duration) || 0
-      };
-    });
+    // Calculate duration for each task
+    const tasksWithDuration = tasks.map(task => ({
+      ...task,
+      duration: task.endTime ? new Date(task.endTime).getTime() - new Date(task.startTime).getTime() : null,
+    }));
 
-    return new Response(JSON.stringify(processedTasks), {
+    return new Response(JSON.stringify(tasksWithDuration), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });

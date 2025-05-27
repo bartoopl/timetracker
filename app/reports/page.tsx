@@ -43,6 +43,8 @@ export default function Reports() {
   const { data: session, status } = useSession();
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [selectedClientId, setSelectedClientId] = useState('');
+  const [clients, setClients] = useState<{ id: string; name: string; }[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -50,9 +52,31 @@ export default function Reports() {
 
   useEffect(() => {
     if (status === 'authenticated') {
+      fetchClients();
       fetchTasks();
     }
   }, [status, session]);
+
+  const fetchClients = async () => {
+    try {
+      const response = await fetch('/api/clients', {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+      
+      if (!response.ok) {
+        throw new Error('Błąd podczas pobierania klientów');
+      }
+      
+      const data = await response.json();
+      setClients(data);
+    } catch (error) {
+      console.error('Błąd podczas pobierania klientów:', error);
+      setClients([]);
+    }
+  };
 
   const fetchTasks = async () => {
     setLoading(true);
@@ -72,6 +96,10 @@ export default function Reports() {
         
         url.searchParams.set('startDate', formattedStartDate);
         url.searchParams.set('endDate', formattedEndDate);
+      }
+
+      if (selectedClientId) {
+        url.searchParams.set('clientId', selectedClientId);
       }
       
       const response = await fetch(url);
@@ -112,6 +140,11 @@ export default function Reports() {
     } else if (type === 'end' && startDate) {
       fetchTasks();
     }
+  };
+
+  const handleClientChange = (clientId: string) => {
+    setSelectedClientId(clientId);
+    fetchTasks();
   };
 
   const calculateStats = (): TaskStats => {
@@ -200,9 +233,7 @@ export default function Reports() {
                 type="date"
                 value={startDate}
                 onChange={(e) => handleDateChange('start', e.target.value)}
-                className="border rounded px-3 py-2"
-                min="2025-01-01"
-                max="2025-12-31"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
               />
             </div>
             <div>
@@ -213,10 +244,25 @@ export default function Reports() {
                 type="date"
                 value={endDate}
                 onChange={(e) => handleDateChange('end', e.target.value)}
-                className="border rounded px-3 py-2"
-                min="2025-01-01"
-                max="2025-12-31"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
               />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Klient
+              </label>
+              <select
+                value={selectedClientId}
+                onChange={(e) => handleClientChange(e.target.value)}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+              >
+                <option value="">Wszyscy klienci</option>
+                {clients.map((client) => (
+                  <option key={client.id} value={client.id}>
+                    {client.name}
+                  </option>
+                ))}
+              </select>
             </div>
             <button
               onClick={() => toPDF()}
