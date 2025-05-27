@@ -5,6 +5,34 @@ import { authOptions } from '@/app/auth';
 
 const prisma = new PrismaClient();
 
+export async function GET(request: Request) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
+    const clients = await prisma.client.findMany({
+      select: {
+        id: true,
+        name: true,
+      },
+      orderBy: {
+        name: 'asc',
+      },
+    });
+
+    return NextResponse.json(clients);
+  } catch (error) {
+    console.error('Error fetching clients:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch clients' },
+      { status: 500 }
+    );
+  }
+}
+
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
 
