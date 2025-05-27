@@ -1,9 +1,10 @@
 import { PrismaClient } from '@prisma/client';
 import UsersList from './UsersList';
+import { User } from '@/types/user';
 
 const prisma = new PrismaClient();
 
-async function getUsers() {
+async function getUsers(): Promise<User[]> {
   return prisma.user.findMany({
     orderBy: {
       createdAt: 'desc',

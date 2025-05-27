@@ -3,14 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  createdAt: string;
-}
+import { User } from '@/types/user';
 
 export default function UsersList({ users }: { users: User[] }) {
   const router = useRouter();
@@ -18,7 +11,7 @@ export default function UsersList({ users }: { users: User[] }) {
   const [error, setError] = useState('');
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this user?')) {
+    if (!confirm('Czy na pewno chcesz usunąć tego użytkownika?')) {
       return;
     }
 
@@ -31,12 +24,12 @@ export default function UsersList({ users }: { users: User[] }) {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to delete user');
+        throw new Error('Nie udało się usunąć użytkownika');
       }
 
       router.refresh();
     } catch (error) {
-      setError('Failed to delete user');
+      setError('Nie udało się usunąć użytkownika');
     } finally {
       setDeletingId(null);
     }
@@ -45,12 +38,12 @@ export default function UsersList({ users }: { users: User[] }) {
   return (
     <div className="max-w-7xl mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Users</h1>
+        <h1 className="text-2xl font-bold">Użytkownicy</h1>
         <Link
           href="/admin/users/new"
           className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >
-          Add New User
+          Dodaj nowego użytkownika
         </Link>
       </div>
 
@@ -79,24 +72,24 @@ export default function UsersList({ users }: { users: User[] }) {
                         {user.name}
                       </div>
                       <div className="text-sm text-gray-500">{user.email}</div>
+                      <div className="text-sm text-gray-500">
+                        Rola: {user.role}
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center space-x-4">
-                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                      {user.role}
-                    </span>
                     <Link
                       href={`/admin/users/${user.id}`}
                       className="text-blue-600 hover:text-blue-900"
                     >
-                      Edit
+                      Edytuj
                     </Link>
                     <button
                       onClick={() => handleDelete(user.id)}
                       disabled={deletingId === user.id}
                       className="text-red-600 hover:text-red-900 disabled:opacity-50"
                     >
-                      {deletingId === user.id ? 'Deleting...' : 'Delete'}
+                      {deletingId === user.id ? 'Usuwanie...' : 'Usuń'}
                     </button>
                   </div>
                 </div>
