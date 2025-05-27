@@ -3,7 +3,16 @@ import ClientsList from './ClientsList';
 
 const prisma = new PrismaClient();
 
-async function getClients() {
+interface Client {
+  id: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  address: string | null;
+  createdAt: Date;
+}
+
+async function getClients(): Promise<Client[]> {
   return prisma.client.findMany({
     orderBy: {
       createdAt: 'desc',
