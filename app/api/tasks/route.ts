@@ -5,18 +5,20 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export async function GET() {
+export async function GET(request: Request) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const tasks = await prisma.task.findMany({
       where: {
         userId: session.user.id,
-        endTime: null, // tylko aktywne zadania
+      },
+      include: {
+        client: true,
       },
       orderBy: {
         startTime: 'desc',
@@ -25,30 +27,27 @@ export async function GET() {
 
     return NextResponse.json(tasks);
   } catch (error) {
-    console.error('Błąd podczas pobierania zadań:', error);
+    console.error('Error fetching tasks:', error);
     return NextResponse.json(
-      { error: 'Wystąpił błąd podczas pobierania zadań' },
+      { error: 'Failed to fetch tasks' },
       { status: 500 }
     );
   }
 }
 
-export async function POST(req: Request) {
+export async function POST(request: Request) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const body = await req.json();
-    console.log('Otrzymane dane:', body);
-
-    const { title, description, startTime } = body;
+    const { title, description, startTime, endTime, clientId } = await request.json();
 
     if (!title || !startTime) {
       return NextResponse.json(
-        { error: 'Tytuł i czas rozpoczęcia są wymagane' },
+        { error: 'Missing required fields' },
         { status: 400 }
       );
     }
@@ -58,16 +57,17 @@ export async function POST(req: Request) {
         title,
         description,
         startTime: new Date(startTime),
+        endTime: endTime ? new Date(endTime) : null,
         userId: session.user.id,
+        clientId: clientId || null,
       },
     });
 
-    console.log('Utworzone zadanie:', task);
-    return NextResponse.json(task, { status: 201 });
+    return NextResponse.json(task);
   } catch (error) {
-    console.error('Błąd podczas tworzenia zadania:', error);
+    console.error('Error creating task:', error);
     return NextResponse.json(
-      { error: 'Wystąpił błąd podczas tworzenia zadania' },
+      { error: 'Failed to create task' },
       { status: 500 }
     );
   }

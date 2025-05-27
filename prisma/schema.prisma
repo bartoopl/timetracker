@@ -26,9 +26,11 @@ model Task {
   endTime     DateTime?
   duration    Int?
   userId      String
+  clientId    String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   user        User      @relation(fields: [userId], references: [id])
+  client      Client?   @relation(fields: [clientId], references: [id])
 }
 
 model Client {
@@ -39,4 +41,5 @@ model Client {
   address   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  tasks     Task[]
 }
