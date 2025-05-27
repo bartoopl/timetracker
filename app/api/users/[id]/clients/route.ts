@@ -1,9 +1,17 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/auth';
+import { getServerSession } from 'next-auth';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
+
+interface UserClient {
+  client: {
+    id: string;
+    name: string;
+    email: string;
+  };
+}
 
 // Pobierz klientów przypisanych do użytkownika
 export async function GET(
@@ -12,8 +20,18 @@ export async function GET(
 ) {
   const session = await getServerSession(authOptions);
 
-  if (!session || session.user.role !== 'ADMIN') {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!session) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  if (session.user.role !== 'ADMIN') {
+    return new Response(JSON.stringify({ error: 'Forbidden' }), {
+      status: 403,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 
   try {
@@ -32,13 +50,16 @@ export async function GET(
       },
     });
 
-    return NextResponse.json(userClients.map(uc => uc.client));
+    return new Response(JSON.stringify(userClients.map((uc: UserClient) => uc.client)), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
   } catch (error) {
     console.error('Error fetching user clients:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch user clients' },
-      { status: 500 }
-    );
+    return new Response(JSON.stringify({ error: 'Failed to fetch user clients' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 }
 
@@ -49,54 +70,49 @@ export async function POST(
 ) {
   const session = await getServerSession(authOptions);
 
-  if (!session || session.user.role !== 'ADMIN') {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!session) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  if (session.user.role !== 'ADMIN') {
+    return new Response(JSON.stringify({ error: 'Forbidden' }), {
+      status: 403,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 
   try {
     const { clientIds } = await request.json();
 
-    if (!Array.isArray(clientIds)) {
-      return NextResponse.json(
-        { error: 'clientIds must be an array' },
-        { status: 400 }
-      );
-    }
-
-    // Usuń wszystkie istniejące przypisania
+    // Usuń wszystkie istniejące uprawnienia
     await prisma.userClient.deleteMany({
       where: {
         userId: params.id,
       },
     });
 
-    // Dodaj nowe przypisania
-    const userClients = await Promise.all(
-      clientIds.map(clientId =>
-        prisma.userClient.create({
-          data: {
-            userId: params.id,
-            clientId,
-          },
-          include: {
-            client: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-              },
-            },
-          },
-        })
-      )
-    );
+    // Dodaj nowe uprawnienia
+    if (clientIds && clientIds.length > 0) {
+      await prisma.userClient.createMany({
+        data: clientIds.map((clientId: string) => ({
+          userId: params.id,
+          clientId,
+        })),
+      });
+    }
 
-    return NextResponse.json(userClients.map(uc => uc.client));
+    return new Response(JSON.stringify({ success: true }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
   } catch (error) {
-    console.error('Error assigning clients to user:', error);
-    return NextResponse.json(
-      { error: 'Failed to assign clients to user' },
-      { status: 500 }
-    );
+    console.error('Error updating user clients:', error);
+    return new Response(JSON.stringify({ error: 'Failed to update user clients' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 } 
