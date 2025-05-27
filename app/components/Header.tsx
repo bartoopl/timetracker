@@ -37,6 +37,14 @@ export default function Header() {
               >
                 Raporty
               </Link>
+              {session.user?.role === 'ADMIN' && (
+                <Link
+                  href="/admin"
+                  className="text-gray-600 hover:text-gray-900 font-bold border border-black rounded px-3 py-1"
+                >
+                  Panel administracyjny
+                </Link>
+              )}
               <button
                 onClick={() => signOut()}
                 className="text-gray-600 hover:text-gray-900"

@@ -1,0 +1,241 @@
+[
+  {
+    "id": "a161e948-288f-4533-903f-10abd3dfb377",
+    "email": "admin@example.com",
+    "password": "$2a$10$3NjYVzXYbAJ8/CKRBD79POfX6nf5gCGIExrNfzAAlmGhhTW96vXh2",
+    "name": "Administrator",
+    "createdAt": "2025-05-24T21:19:58.045Z",
+    "updatedAt": "2025-05-24T21:19:58.045Z",
+    "tasks": [
+      {
+        "id": "cmb2qlzoe0001i8094fqn8ixu",
+        "title": "Dodanie zdjęć",
+        "description": "",
+        "startTime": "2025-05-24T21:24:04.012Z",
+        "endTime": "2025-05-24T21:24:19.467Z",
+        "duration": null,
+        "userId": "a161e948-288f-4533-903f-10abd3dfb377",
+        "createdAt": "2025-05-24T21:24:04.191Z",
+        "updatedAt": "2025-05-24T21:24:19.468Z"
+      }
+    ]
+  },
+  {
+    "id": "cmb2qnhri0002i8094t3wqcqp",
+    "email": "robert@creativetrust.pl",
+    "password": "$2b$10$d0OadKQYCHJLV/YnjPZzhO5uJ4L7T9ulg/NBiEyrcogevpksCyKVa",
+    "name": "Robert",
+    "createdAt": "2025-05-24T21:25:14.287Z",
+    "updatedAt": "2025-05-24T21:25:14.287Z",
+    "tasks": [
+      {
+        "id": "cmb3w4tif0001jm09avmrc74e",
+        "title": "Opisy produktów wraz z przypisaniem do kategorii",
+        "description": "",
+        "startTime": "2025-05-25T16:46:28.782Z",
+        "endTime": "2025-05-25T20:23:12.592Z",
+        "duration": null,
+        "userId": "cmb2qnhri0002i8094t3wqcqp",
+        "createdAt": "2025-05-25T16:46:26.812Z",
+        "updatedAt": "2025-05-25T20:23:12.593Z"
+      },
+      {
+        "id": "cmb4sp0te0001l109rquv5bzt",
+        "title": "Uzupełnianie produktów - opisy i kategorie",
+        "description": "",
+        "startTime": "2025-05-26T07:57:54.465Z",
+        "endTime": "2025-05-26T08:58:41.729Z",
+        "duration": null,
+        "userId": "cmb2qnhri0002i8094t3wqcqp",
+        "createdAt": "2025-05-26T07:57:57.217Z",
+        "updatedAt": "2025-05-26T08:58:41.730Z"
+      },
+      {
+        "id": "cmb54bynt0001gy0a8xhqi6dw",
+        "title": "Uzupełnianie produktów - opisy i kategorie",
+        "description": "",
+        "startTime": "2025-05-26T13:23:41.177Z",
+        "endTime": "2025-05-26T13:50:11.389Z",
+        "duration": null,
+        "userId": "cmb2qnhri0002i8094t3wqcqp",
+        "createdAt": "2025-05-26T13:23:43.288Z",
+        "updatedAt": "2025-05-26T13:50:11.390Z"
+      }
+    ]
+  },
+  {
+    "id": "cmb2qpepi0000la09og49152l",
+    "email": "bartosz@creativetrust.pl",
+    "password": "$2b$10$0LUFv/knXavy4W7fiqmpZ.enITToYaO71mTBXImtqBSHkH7IdoGUy",
+    "name": "Bartosz",
+    "createdAt": "2025-05-24T21:26:43.638Z",
+    "updatedAt": "2025-05-24T21:26:43.638Z",
+    "tasks": [
+      {
+        "id": "cmb2qpz4d0004i809fkk4unq7",
+        "title": "Dodanie zdjęć do panelu",
+        "description": "",
+        "startTime": "2025-05-24T21:27:09.946Z",
+        "endTime": "2025-05-24T21:50:14.449Z",
+        "duration": null,
+        "userId": "cmb2qpepi0000la09og49152l",
+        "createdAt": "2025-05-24T21:27:10.093Z",
+        "updatedAt": "2025-05-24T21:50:14.450Z"
+      },
+      {
+        "id": "cmb2rng590001lb09w7ienheu",
+        "title": "Test",
+        "description": "",
+        "startTime": "2025-05-24T21:53:09.832Z",
+        "endTime": "2025-05-24T21:53:16.598Z",
+        "duration": null,
+        "userId": "cmb2qpepi0000la09og49152l",
+        "createdAt": "2025-05-24T21:53:11.804Z",
+        "updatedAt": "2025-05-24T21:53:16.599Z"
+      },
+      {
+        "id": "cmb3sl4xz0001jp09nua81khw",
+        "title": "Dodanie zdjęć produktów",
+        "description": "",
+        "startTime": "2025-05-25T15:07:09.367Z",
+        "endTime": "2025-05-25T15:53:41.077Z",
+        "duration": null,
+        "userId": "cmb2qpepi0000la09og49152l",
+        "createdAt": "2025-05-25T15:07:09.661Z",
+        "updatedAt": "2025-05-25T15:53:41.078Z"
+      },
+      {
+        "id": "cmb4xbxxb0001jr09joglsymv",
+        "title": "Pobranie torebek z Monnari",
+        "description": "",
+        "startTime": "2025-05-26T10:07:44.161Z",
+        "endTime": "2025-05-26T10:52:49.826Z",
+        "duration": null,
+        "userId": "cmb2qpepi0000la09og49152l",
+        "createdAt": "2025-05-26T10:07:44.914Z",
+        "updatedAt": "2025-05-26T10:52:49.827Z"
+      },
+      {
+        "id": "cmb4yzzoq0001l509j2bn57o1",
+        "title": "Przygotowanie bazy do SMS dla MPK303 i 1029 ",
+        "description": "Dla Joanny Zalewskiej",
+        "startTime": "2025-05-26T10:54:25.965Z",
+        "endTime": "2025-05-26T10:58:50.775Z",
+        "duration": null,
+        "userId": "cmb2qpepi0000la09og49152l",
+        "createdAt": "2025-05-26T10:54:26.556Z",
+        "updatedAt": "2025-05-26T10:58:50.776Z"
+      },
+      {
+        "id": "cmb52j0800001l809n3cb8hop",
+        "title": "Odpowiedź na zgłoszenie BOK",
+        "description": "",
+        "startTime": "2025-05-26T12:33:10.917Z",
+        "endTime": "2025-05-26T12:42:43.901Z",
+        "duration": null,
+        "userId": "cmb2qpepi0000la09og49152l",
+        "createdAt": "2025-05-26T12:33:12.671Z",
+        "updatedAt": "2025-05-26T12:42:43.902Z"
+      },
+      {
+        "id": "cmb52z67x0001jp095fpj5y15",
+        "title": "Zmiana etykiet na sklepie internetowym oraz dodanie nowych banerów",
+        "description": "",
+        "startTime": "2025-05-26T12:45:43.856Z",
+        "endTime": "2025-05-26T12:58:08.667Z",
+        "duration": null,
+        "userId": "cmb2qpepi0000la09og49152l",
+        "createdAt": "2025-05-26T12:45:46.940Z",
+        "updatedAt": "2025-05-26T12:58:08.668Z"
+      },
+      {
+        "id": "cl_1",
+        "title": "Dodanie kodów rabatowych",
+        "description": "MAJ20 i MAJ30",
+        "startTime": "2025-05-06T12:14:00.000Z",
+        "endTime": "2025-05-06T12:19:00.000Z",
+        "duration": 300000,
+        "userId": "cmb2qpepi0000la09og49152l",
+        "createdAt": "2025-05-26T14:16:21.076Z",
+        "updatedAt": "2025-05-26T14:16:21.076Z"
+      },
+      {
+        "id": "cl_2",
+        "title": "Dodanie webpusha",
+        "description": "Tylko do północy... __\nNOWA KOLEKCJA z extra rabatami! -25% przy zakupach za min. 200zł lub -20% przy zakupach za min. 150zł __\nSpiesz się!",
+        "startTime": "2025-05-06T14:30:00.000Z",
+        "endTime": "2025-05-06T14:39:00.000Z",
+        "duration": 540000,
+        "userId": "cmb2qpepi0000la09og49152l",
+        "createdAt": "2025-05-26T14:16:21.076Z",
+        "updatedAt": "2025-05-26T14:16:21.076Z"
+      },
+      {
+        "id": "cl_3",
+        "title": "Przygotowanie i wysyłka newslettera",
+        "description": null,
+        "startTime": "2025-05-07T10:05:00.000Z",
+        "endTime": "2025-05-07T10:49:00.000Z",
+        "duration": 2640000,
+        "userId": "cmb2qpepi0000la09og49152l",
+        "createdAt": "2025-05-26T14:16:21.076Z",
+        "updatedAt": "2025-05-26T14:16:21.076Z"
+      },
+      {
+        "id": "cmb65o37h0001lg09bzkcppap",
+        "title": "Wgranie cen promocyjnych oraz kontrola czy na stanach pojawiły się nowe modele",
+        "description": "",
+        "startTime": "2025-05-27T06:48:54.500Z",
+        "endTime": "2025-05-27T06:51:37.908Z",
+        "duration": null,
+        "userId": "cmb2qpepi0000la09og49152l",
+        "createdAt": "2025-05-27T06:48:54.735Z",
+        "updatedAt": "2025-05-27T06:51:37.908Z"
+      },
+      {
+        "id": "cmb65t2vj0003lg09zfip80ep",
+        "title": "Dodanie podkategorii do promocji oraz przypisanie produktów",
+        "description": "",
+        "startTime": "2025-05-27T06:52:46.990Z",
+        "endTime": "2025-05-27T07:38:43.066Z",
+        "duration": null,
+        "userId": "cmb2qpepi0000la09og49152l",
+        "createdAt": "2025-05-27T06:52:47.585Z",
+        "updatedAt": "2025-05-27T07:38:43.067Z"
+      },
+      {
+        "id": "cmb67lw2e0001l4093mcoerai",
+        "title": "Podmiana banera",
+        "description": "",
+        "startTime": "2025-05-27T07:43:11.101Z",
+        "endTime": "2025-05-27T07:46:48.547Z",
+        "duration": null,
+        "userId": "cmb2qpepi0000la09og49152l",
+        "createdAt": "2025-05-27T07:43:11.395Z",
+        "updatedAt": "2025-05-27T07:46:48.548Z"
+      },
+      {
+        "id": "cmb6911920001l2097gv7bov5",
+        "title": "Dodanie produktów z nowej promocji do odpowiednich podkategorii",
+        "description": "",
+        "startTime": "2025-05-27T08:22:56.035Z",
+        "endTime": "2025-05-27T09:22:37.454Z",
+        "duration": null,
+        "userId": "cmb2qpepi0000la09og49152l",
+        "createdAt": "2025-05-27T08:22:57.685Z",
+        "updatedAt": "2025-05-27T09:22:37.455Z"
+      },
+      {
+        "id": "cmb6b61ip0001l50917s06z7r",
+        "title": "Publikacja produktów + opisy",
+        "description": " 3N480N 5R4807 5T4806 6V4804 6X4803",
+        "startTime": "2025-05-27T09:22:50.298Z",
+        "endTime": "2025-05-27T09:48:31.029Z",
+        "duration": null,
+        "userId": "cmb2qpepi0000la09og49152l",
+        "createdAt": "2025-05-27T09:22:50.545Z",
+        "updatedAt": "2025-05-27T09:48:31.030Z"
+      }
+    ]
+  }
+]

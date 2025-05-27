@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { PrismaClient } from '@prisma/client';
-import { hash } from 'bcrypt';
 import { authOptions } from '@/app/auth';
 
 const prisma = new PrismaClient();
@@ -14,50 +13,48 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { name, email, password, role } = await request.json();
+    const { name, email, phone, address } = await request.json();
 
-    if (!name || !email || !password) {
+    if (!name || !email) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
       );
     }
 
-    // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
+    // Check if client already exists
+    const existingClient = await prisma.client.findUnique({
       where: { email },
     });
 
-    if (existingUser) {
+    if (existingClient) {
       return NextResponse.json(
-        { error: 'User with this email already exists' },
+        { error: 'Client with this email already exists' },
         { status: 400 }
       );
     }
 
-    // Hash password
-    const hashedPassword = await hash(password, 10);
-
-    // Create user
-    const user = await prisma.user.create({
+    // Create client
+    const client = await prisma.client.create({
       data: {
         name,
         email,
-        password: hashedPassword,
-        role: role || 'USER',
+        phone,
+        address,
       },
     });
 
     return NextResponse.json({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
+      id: client.id,
+      name: client.name,
+      email: client.email,
+      phone: client.phone,
+      address: client.address,
     });
   } catch (error) {
-    console.error('Error creating user:', error);
+    console.error('Error creating client:', error);
     return NextResponse.json(
-      { error: 'Failed to create user' },
+      { error: 'Failed to create client' },
       { status: 500 }
     );
   }

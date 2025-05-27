@@ -220,7 +220,7 @@ export default function Reports() {
             </div>
             <button
               onClick={() => toPDF()}
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
             >
               Exportuj do PDF
             </button>
@@ -230,17 +230,17 @@ export default function Reports() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               <div className="bg-gray-50 p-4 rounded-lg">
                 <h3 className="text-lg font-medium text-gray-900 mb-2">Łączna liczba zadań</h3>
-                <p className="text-3xl font-bold text-blue-600">{stats.totalTasks}</p>
+                <p className="text-3xl font-bold text-black">{stats.totalTasks}</p>
               </div>
               <div className="bg-gray-50 p-4 rounded-lg">
                 <h3 className="text-lg font-medium text-gray-900 mb-2">Łączny czas pracy</h3>
-                <p className="text-3xl font-bold text-blue-600">
+                <p className="text-3xl font-bold text-black">
                   {formatDuration(stats.totalDuration)}
                 </p>
               </div>
               <div className="bg-gray-50 p-4 rounded-lg">
                 <h3 className="text-lg font-medium text-gray-900 mb-2">Średni czas zadania</h3>
-                <p className="text-3xl font-bold text-blue-600">
+                <p className="text-3xl font-bold text-black">
                   {formatDuration(stats.averageDuration)}
                 </p>
               </div>

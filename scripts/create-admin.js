@@ -25,6 +25,7 @@ async function createAdminUser() {
         email: 'admin@example.com',
         name: 'Administrator',
         password: hashedPassword,
+        role: 'ADMIN'
       },
     });
 
