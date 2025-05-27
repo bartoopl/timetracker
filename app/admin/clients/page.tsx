@@ -1,16 +1,8 @@
 import { PrismaClient } from '@prisma/client';
 import ClientsList from './ClientsList';
+import { Client } from '@/types/client';
 
 const prisma = new PrismaClient();
-
-interface Client {
-  id: string;
-  name: string;
-  email: string;
-  phone: string | null;
-  address: string | null;
-  createdAt: Date;
-}
 
 async function getClients(): Promise<Client[]> {
   return prisma.client.findMany({

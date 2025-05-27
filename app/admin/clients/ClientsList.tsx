@@ -3,15 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-
-interface Client {
-  id: string;
-  name: string;
-  email: string;
-  phone?: string | null;
-  address?: string | null;
-  createdAt: string;
-}
+import { Client } from '@/types/client';
 
 export default function ClientsList({ clients }: { clients: Client[] }) {
   const router = useRouter();
