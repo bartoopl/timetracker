@@ -18,7 +18,12 @@ export async function GET(request: Request) {
         userId: session.user.id,
       },
       include: {
-        client: true,
+        client: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
       orderBy: {
         startTime: 'desc',
@@ -60,6 +65,14 @@ export async function POST(request: Request) {
         endTime: endTime ? new Date(endTime) : null,
         userId: session.user.id,
         clientId: clientId || null,
+      },
+      include: {
+        client: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
     });
 

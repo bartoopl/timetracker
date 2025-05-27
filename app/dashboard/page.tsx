@@ -11,6 +11,11 @@ interface Task {
   description?: string;
   startTime: string;
   endTime?: string;
+  clientId?: string;
+  client?: {
+    id: string;
+    name: string;
+  };
 }
 
 export default function Dashboard() {
@@ -19,9 +24,11 @@ export default function Dashboard() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [clients, setClients] = useState<{ id: string; name: string; }[]>([]);
   const [newTask, setNewTask] = useState({
     title: '',
-    description: ''
+    description: '',
+    clientId: ''
   });
 
   useEffect(() => {
@@ -33,8 +40,30 @@ export default function Dashboard() {
   useEffect(() => {
     if (status === 'authenticated') {
       fetchTasks();
+      fetchClients();
     }
   }, [status]);
+
+  const fetchClients = async () => {
+    try {
+      const response = await fetch('/api/clients', {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+      
+      if (!response.ok) {
+        throw new Error('Błąd podczas pobierania klientów');
+      }
+      
+      const data = await response.json();
+      setClients(data);
+    } catch (error) {
+      console.error('Błąd podczas pobierania klientów:', error);
+      setClients([]);
+    }
+  };
 
   const fetchTasks = async () => {
     try {
@@ -88,7 +117,7 @@ export default function Dashboard() {
       }
 
       console.log('Zadanie utworzone:', data);
-      setNewTask({ title: '', description: '' });
+      setNewTask({ title: '', description: '', clientId: '' });
       fetchTasks();
     } catch (error) {
       console.error('Błąd podczas rozpoczynania zadania:', error);
@@ -183,6 +212,24 @@ export default function Dashboard() {
                 rows={3}
               />
             </div>
+            <div>
+              <label htmlFor="clientId" className="block text-sm font-medium text-gray-700">
+                Klient (opcjonalnie)
+              </label>
+              <select
+                id="clientId"
+                value={newTask.clientId}
+                onChange={(e) => setNewTask({ ...newTask, clientId: e.target.value })}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+              >
+                <option value="">Wybierz klienta</option>
+                {clients.map((client) => (
+                  <option key={client.id} value={client.id}>
+                    {client.name}
+                  </option>
+                ))}
+              </select>
+            </div>
             <button
               type="submit"
               className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
@@ -200,27 +247,29 @@ export default function Dashboard() {
           ) : (
             <div className="space-y-4">
               {tasks.map((task) => (
-                <div
-                  key={task.id}
-                  className="border rounded-lg p-4 flex justify-between items-center"
-                >
-                  <div>
-                    <h3 className="font-medium">{task.title}</h3>
-                    {task.description && (
-                      <p className="text-sm text-gray-500">{task.description}</p>
-                    )}
-                    <p className="text-sm text-gray-500">
-                      Rozpoczęto: {new Date(task.startTime).toLocaleString()}
-                    </p>
-                  </div>
-                  {!task.endTime && (
+                <div key={task.id} className="border rounded-lg p-4">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="text-lg font-medium">{task.title}</h3>
+                      {task.description && (
+                        <p className="text-gray-600 mt-1">{task.description}</p>
+                      )}
+                      {task.client && (
+                        <p className="text-sm text-gray-500 mt-1">
+                          Klient: {task.client.name}
+                        </p>
+                      )}
+                      <p className="text-sm text-gray-500 mt-1">
+                        Rozpoczęto: {new Date(task.startTime).toLocaleString()}
+                      </p>
+                    </div>
                     <button
                       onClick={() => stopTask(task.id)}
                       className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                     >
-                      Zakończ
+                      Zatrzymaj
                     </button>
-                  )}
+                  </div>
                 </div>
               ))}
             </div>
