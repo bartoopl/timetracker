@@ -24,6 +24,7 @@ export async function GET(request: Request) {
     const startDate = searchParams.get('startDate');
     const endDate = searchParams.get('endDate');
     const clientId = searchParams.get('clientId');
+    const userId = searchParams.get('userId');
 
     console.log('Raw date parameters:', { startDate, endDate });
 
@@ -39,10 +40,9 @@ export async function GET(request: Request) {
 
     const allowedClientIds = userClients.map(uc => uc.clientId);
 
-    const where: any = {
-      userId: session.user.id,
-    };
+    const where: any = {};
 
+    // Filtrowanie po datach
     if (startDate && endDate) {
       where.startTime = {
         gte: new Date(startDate),
@@ -50,14 +50,22 @@ export async function GET(request: Request) {
       };
     }
 
-    // Jeśli użytkownik nie jest adminem, pokazuj tylko zadania dla klientów, do których ma dostęp
-    if (session.user.role !== 'ADMIN') {
+    // Filtrowanie po użytkowniku
+    if (userId) {
+      where.userId = userId;
+    } else if (session.user.role !== 'ADMIN') {
+      // Jeśli nie jest adminem, pokazuj tylko swoje zadania
+      where.userId = session.user.id;
+    }
+
+    // Filtrowanie po kliencie
+    if (clientId) {
+      where.clientId = clientId;
+    } else if (session.user.role !== 'ADMIN') {
+      // Jeśli nie jest adminem, pokazuj tylko zadania dla klientów, do których ma dostęp
       where.clientId = {
         in: allowedClientIds,
       };
-    } else if (clientId) {
-      // Jeśli jest adminem i wybrano konkretnego klienta
-      where.clientId = clientId;
     }
 
     const tasks = await prisma.task.findMany({

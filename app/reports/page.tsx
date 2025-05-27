@@ -44,7 +44,9 @@ export default function Reports() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [selectedClientId, setSelectedClientId] = useState('');
+  const [selectedUserId, setSelectedUserId] = useState('');
   const [clients, setClients] = useState<{ id: string; name: string; }[]>([]);
+  const [users, setUsers] = useState<{ id: string; name: string; }[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -53,6 +55,9 @@ export default function Reports() {
   useEffect(() => {
     if (status === 'authenticated') {
       fetchClients();
+      if (session.user.role === 'ADMIN') {
+        fetchUsers();
+      }
       fetchTasks();
     }
   }, [status, session]);
@@ -78,6 +83,27 @@ export default function Reports() {
     }
   };
 
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch('/api/users', {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+      
+      if (!response.ok) {
+        throw new Error('Błąd podczas pobierania użytkowników');
+      }
+      
+      const data = await response.json();
+      setUsers(data);
+    } catch (error) {
+      console.error('Błąd podczas pobierania użytkowników:', error);
+      setUsers([]);
+    }
+  };
+
   const fetchTasks = async () => {
     setLoading(true);
     setError(null);
@@ -100,6 +126,10 @@ export default function Reports() {
 
       if (selectedClientId) {
         url.searchParams.set('clientId', selectedClientId);
+      }
+
+      if (selectedUserId) {
+        url.searchParams.set('userId', selectedUserId);
       }
       
       const response = await fetch(url);
@@ -144,6 +174,11 @@ export default function Reports() {
 
   const handleClientChange = (clientId: string) => {
     setSelectedClientId(clientId);
+    fetchTasks();
+  };
+
+  const handleUserChange = (userId: string) => {
+    setSelectedUserId(userId);
     fetchTasks();
   };
 
@@ -199,32 +234,36 @@ export default function Reports() {
     return (
       <div className="min-h-screen bg-gray-100 p-8">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center">Ładowanie zadań...</div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-100 p-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center text-red-500">{error}</div>
+          <div className="text-center">Ładowanie danych...</div>
         </div>
       </div>
     );
   }
 
   const stats = calculateStats();
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-7xl mx-auto">
         <div className="bg-white rounded-lg shadow p-6 mb-6">
           <h1 className="text-2xl font-bold mb-6">Raporty</h1>
-          
-          <div className="mb-6 flex gap-4 items-end">
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <h3 className="text-sm font-medium text-blue-600">Łączna liczba zadań</h3>
+              <p className="text-2xl font-bold text-blue-700">{stats.totalTasks}</p>
+            </div>
+            <div className="bg-green-50 p-4 rounded-lg">
+              <h3 className="text-sm font-medium text-green-600">Łączny czas</h3>
+              <p className="text-2xl font-bold text-green-700">{formatDuration(stats.totalDuration)}</p>
+            </div>
+            <div className="bg-purple-50 p-4 rounded-lg">
+              <h3 className="text-sm font-medium text-purple-600">Średni czas zadania</h3>
+              <p className="text-2xl font-bold text-purple-700">{formatDuration(stats.averageDuration)}</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Data początkowa
@@ -233,7 +272,7 @@ export default function Reports() {
                 type="date"
                 value={startDate}
                 onChange={(e) => handleDateChange('start', e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
               />
             </div>
             <div>
@@ -244,9 +283,12 @@ export default function Reports() {
                 type="date"
                 value={endDate}
                 onChange={(e) => handleDateChange('end', e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
               />
             </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Klient
@@ -254,7 +296,7 @@ export default function Reports() {
               <select
                 value={selectedClientId}
                 onChange={(e) => handleClientChange(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
               >
                 <option value="">Wszyscy klienci</option>
                 {clients.map((client) => (
@@ -264,37 +306,37 @@ export default function Reports() {
                 ))}
               </select>
             </div>
-            <button
-              onClick={() => toPDF()}
-              className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
-            >
-              Exportuj do PDF
-            </button>
+            {session?.user.role === 'ADMIN' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Użytkownik
+                </label>
+                <select
+                  value={selectedUserId}
+                  onChange={(e) => handleUserChange(e.target.value)}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                >
+                  <option value="">Wszyscy użytkownicy</option>
+                  {users.map((user) => (
+                    <option key={user.id} value={user.id}>
+                      {user.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
 
-          <div ref={targetRef}>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Łączna liczba zadań</h3>
-                <p className="text-3xl font-bold text-black">{stats.totalTasks}</p>
-              </div>
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Łączny czas pracy</h3>
-                <p className="text-3xl font-bold text-black">
-                  {formatDuration(stats.totalDuration)}
-                </p>
-              </div>
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Średni czas zadania</h3>
-                <p className="text-3xl font-bold text-black">
-                  {formatDuration(stats.averageDuration)}
-                </p>
-              </div>
+          {error && (
+            <div className="bg-red-50 text-red-500 p-4 rounded-lg mb-6">
+              {error}
             </div>
+          )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+          <div ref={targetRef}>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
               <div className="bg-white p-4 rounded-lg shadow">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Zadania według dnia</h3>
+                <h3 className="text-lg font-medium mb-4">Zadania według dnia</h3>
                 <div className="h-80">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={stats.tasksByDay}>
@@ -303,14 +345,14 @@ export default function Reports() {
                       <YAxis />
                       <Tooltip />
                       <Legend />
-                      <Bar dataKey="count" fill="#8884d8" name="Liczba zadań" />
+                      <Bar dataKey="count" fill="#3B82F6" name="Liczba zadań" />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
               </div>
 
               <div className="bg-white p-4 rounded-lg shadow">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Zadania według użytkownika</h3>
+                <h3 className="text-lg font-medium mb-4">Zadania według użytkownika</h3>
                 <div className="h-80">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
@@ -320,11 +362,12 @@ export default function Reports() {
                         nameKey="user"
                         cx="50%"
                         cy="50%"
-                        outerRadius={100}
+                        outerRadius={80}
+                        fill="#8884d8"
                         label
                       >
                         {stats.tasksByUser.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          <Cell key={`cell-${index}`} fill={`hsl(${index * 45}, 70%, 50%)`} />
                         ))}
                       </Pie>
                       <Tooltip />
@@ -335,55 +378,62 @@ export default function Reports() {
               </div>
             </div>
 
-            <div className="space-y-8">
-              <div>
-                <h2 className="text-xl font-semibold mb-4">Lista zadań</h2>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Zadanie
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Użytkownik
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Data rozpoczęcia
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Data zakończenia
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Czas trwania
-                        </th>
+            <div className="bg-white p-4 rounded-lg shadow">
+              <h3 className="text-lg font-medium mb-4">Lista zadań</h3>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Tytuł
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Użytkownik
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Data rozpoczęcia
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Data zakończenia
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Czas trwania
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {tasks.map((task) => (
+                      <tr key={task.id}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {task.title}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {task.user.name}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {new Date(task.startTime).toLocaleString('pl-PL')}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {task.endTime ? new Date(task.endTime).toLocaleString('pl-PL') : '-'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {formatDuration(task.duration)}
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {tasks.map((task) => (
-                        <tr key={task.id}>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            {task.title}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            {task.user.name} ({task.user.email})
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            {new Date(task.startTime).toLocaleString('pl-PL')}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            {task.endTime ? new Date(task.endTime).toLocaleString('pl-PL') : 'W trakcie'}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            {formatDuration(task.duration)}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
+          </div>
+
+          <div className="mt-6">
+            <button
+              onClick={() => toPDF()}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Pobierz raport PDF
+            </button>
           </div>
         </div>
       </div>
