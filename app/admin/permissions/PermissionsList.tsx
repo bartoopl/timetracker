@@ -56,15 +56,17 @@ export default function PermissionsList({ users }: { users: User[] }) {
                     <div className="flex-shrink-0">
                       <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
                         <span className="text-gray-500 text-lg font-medium">
-                          {user.name.charAt(0).toUpperCase()}
+                          {user.name ? user.name.charAt(0).toUpperCase() : '?'}
                         </span>
                       </div>
                     </div>
                     <div className="ml-4">
                       <div className="text-sm font-medium text-gray-900">
-                        {user.name}
+                        {user.name || 'Brak nazwy'}
                       </div>
-                      <div className="text-sm text-gray-500">{user.email}</div>
+                      <div className="text-sm text-gray-500">
+                        {user.email || 'Brak emaila'}
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center space-x-4">
