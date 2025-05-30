@@ -6,14 +6,54 @@ import { authOptions } from '@/app/auth';
 const prisma = new PrismaClient();
 
 export async function GET(request: Request) {
+  console.log('GET /api/clients - Start');
+  
   const session = await getServerSession(authOptions);
+  console.log('Session:', session);
 
   if (!session) {
+    console.log('No session found');
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   try {
+    console.log('Fetching clients for user:', session.user.id);
+    
+    // Jeśli użytkownik jest administratorem, zwróć wszystkich klientów
+    if (session.user.role === 'ADMIN') {
+      console.log('User is admin, returning all clients');
+      const clients = await prisma.client.findMany({
+        select: {
+          id: true,
+          name: true,
+        },
+        orderBy: {
+          name: 'asc',
+        },
+      });
+      console.log('Found clients:', clients);
+      return NextResponse.json(clients);
+    }
+    
+    // Dla zwykłych użytkowników sprawdź uprawnienia
+    const userClients = await prisma.userClient.findMany({
+      where: {
+        userId: session.user.id,
+      },
+      select: {
+        clientId: true,
+      },
+    });
+
+    const allowedClientIds = userClients.map(uc => uc.clientId);
+    console.log('Allowed client IDs:', allowedClientIds);
+
     const clients = await prisma.client.findMany({
+      where: {
+        id: {
+          in: allowedClientIds,
+        },
+      },
       select: {
         id: true,
         name: true,
@@ -23,6 +63,7 @@ export async function GET(request: Request) {
       },
     });
 
+    console.log('Found clients:', clients);
     return NextResponse.json(clients);
   } catch (error) {
     console.error('Error fetching clients:', error);

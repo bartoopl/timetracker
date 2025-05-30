@@ -16,38 +16,40 @@ export default function Navbar() {
                 WorkTracker
               </Link>
             </div>
-            <div className="hidden md:block">
-              <div className="ml-10 flex items-baseline space-x-4">
-                <Link
-                  href="/dashboard"
-                  className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-                >
-                  Dashboard
-                </Link>
-                <Link
-                  href="/reports"
-                  className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-                >
-                  Raporty
-                </Link>
-                {session?.user?.role === 'ADMIN' && (
-                  <>
-                    <Link
-                      href="/admin/users"
-                      className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-                    >
-                      Zarządzanie użytkownikami
-                    </Link>
-                    <Link
-                      href="/admin/clients"
-                      className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-                    >
-                      Zarządzanie klientami
-                    </Link>
-                  </>
-                )}
+            {session && (
+              <div className="hidden md:block">
+                <div className="ml-10 flex items-baseline space-x-4">
+                  <Link
+                    href="/dashboard"
+                    className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                  >
+                    Dashboard
+                  </Link>
+                  <Link
+                    href="/reports"
+                    className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                  >
+                    Raporty
+                  </Link>
+                  {session?.user?.role === 'ADMIN' && (
+                    <>
+                      <Link
+                        href="/admin/users"
+                        className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                      >
+                        Zarządzanie użytkownikami
+                      </Link>
+                      <Link
+                        href="/admin/clients"
+                        className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                      >
+                        Zarządzanie klientami
+                      </Link>
+                    </>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
           </div>
           <div className="hidden md:block">
             <div className="ml-4 flex items-center md:ml-6">

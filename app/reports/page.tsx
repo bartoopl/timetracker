@@ -29,6 +29,10 @@ interface Task {
     name: string;
     email: string;
   };
+  client: {
+    id: string;
+    name: string;
+  } | null;
 }
 
 interface TaskStats {
@@ -64,6 +68,7 @@ export default function Reports() {
 
   const fetchClients = async () => {
     try {
+      console.log('Fetching clients...');
       const response = await fetch('/api/clients', {
         headers: {
           'Content-Type': 'application/json',
@@ -76,6 +81,7 @@ export default function Reports() {
       }
       
       const data = await response.json();
+      console.log('Fetched clients:', data);
       setClients(data);
     } catch (error) {
       console.error('Błąd podczas pobierania klientów:', error);
@@ -125,6 +131,7 @@ export default function Reports() {
       }
 
       if (selectedClientId) {
+        console.log('Setting clientId in URL:', selectedClientId);
         url.searchParams.set('clientId', selectedClientId);
       }
 
@@ -132,6 +139,7 @@ export default function Reports() {
         url.searchParams.set('userId', selectedUserId);
       }
       
+      console.log('Fetching tasks with URL:', url.toString());
       const response = await fetch(url);
       
       if (!response.ok) {
@@ -140,8 +148,15 @@ export default function Reports() {
       }
 
       const data = await response.json();
+      console.log('Fetched tasks:', data.map((task: any) => ({
+        id: task.id,
+        title: task.title,
+        clientId: task.clientId,
+        client: task.client
+      })));
       setTasks(Array.isArray(data) ? data : []);
     } catch (err) {
+      console.error('Error fetching tasks:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch tasks');
     } finally {
       setLoading(false);
@@ -173,6 +188,7 @@ export default function Reports() {
   };
 
   const handleClientChange = (clientId: string) => {
+    console.log('Client changed to:', clientId);
     setSelectedClientId(clientId);
     fetchTasks();
   };
@@ -388,6 +404,9 @@ export default function Reports() {
                         Tytuł
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Klient
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Użytkownik
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -406,6 +425,9 @@ export default function Reports() {
                       <tr key={task.id}>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {task.title}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {task.client?.name || '-'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {task.user.name}

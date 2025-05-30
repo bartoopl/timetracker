@@ -26,7 +26,7 @@ export async function GET(request: Request) {
     const clientId = searchParams.get('clientId');
     const userId = searchParams.get('userId');
 
-    console.log('Raw date parameters:', { startDate, endDate });
+    console.log('Query parameters:', { startDate, endDate, clientId, userId });
 
     // Pobierz listę klientów, do których użytkownik ma dostęp
     const userClients = await prisma.userClient.findMany({
@@ -39,6 +39,7 @@ export async function GET(request: Request) {
     });
 
     const allowedClientIds = userClients.map(uc => uc.clientId);
+    console.log('Allowed client IDs for user:', allowedClientIds);
 
     const where: any = {};
 
@@ -60,13 +61,19 @@ export async function GET(request: Request) {
 
     // Filtrowanie po kliencie
     if (clientId) {
+      console.log('Filtering by client ID:', clientId);
       where.clientId = clientId;
     } else if (session.user.role !== 'ADMIN') {
       // Jeśli nie jest adminem, pokazuj tylko zadania dla klientów, do których ma dostęp
+      console.log('Non-admin user, filtering by allowed clients:', allowedClientIds);
       where.clientId = {
         in: allowedClientIds,
       };
+    } else {
+      console.log('Admin user, no client filtering applied');
     }
+
+    console.log('Final where clause:', JSON.stringify(where, null, 2));
 
     const tasks = await prisma.task.findMany({
       where,
@@ -88,6 +95,14 @@ export async function GET(request: Request) {
         startTime: 'desc',
       },
     });
+
+    console.log('Found tasks count:', tasks.length);
+    console.log('First few tasks:', tasks.slice(0, 3).map(task => ({
+      id: task.id,
+      title: task.title,
+      clientId: task.clientId,
+      client: task.client
+    })));
 
     // Calculate duration for each task
     const tasksWithDuration = tasks.map(task => ({
