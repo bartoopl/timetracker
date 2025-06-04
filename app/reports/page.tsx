@@ -123,15 +123,11 @@ export default function Reports() {
         const end = new Date(endDate);
         end.setUTCHours(23, 59, 59, 999);
         
-        const formattedStartDate = start.toISOString().split('T')[0];
-        const formattedEndDate = end.toISOString().split('T')[0];
-        
-        url.searchParams.set('startDate', formattedStartDate);
-        url.searchParams.set('endDate', formattedEndDate);
+        url.searchParams.set('startDate', start.toISOString());
+        url.searchParams.set('endDate', end.toISOString());
       }
 
       if (selectedClientId) {
-        console.log('Setting clientId in URL:', selectedClientId);
         url.searchParams.set('clientId', selectedClientId);
       }
 
@@ -140,7 +136,12 @@ export default function Reports() {
       }
       
       console.log('Fetching tasks with URL:', url.toString());
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
       
       if (!response.ok) {
         const errorData = await response.json();
@@ -152,7 +153,9 @@ export default function Reports() {
         id: task.id,
         title: task.title,
         clientId: task.clientId,
-        client: task.client
+        client: task.client,
+        startTime: task.startTime,
+        endTime: task.endTime
       })));
       setTasks(Array.isArray(data) ? data : []);
     } catch (err) {
@@ -177,24 +180,22 @@ export default function Reports() {
     } else {
       setEndDate(value);
     }
-
-    if (startDate && endDate) {
-      fetchTasks();
-    } else if (type === 'start' && endDate) {
-      fetchTasks();
-    } else if (type === 'end' && startDate) {
-      fetchTasks();
-    }
   };
 
   const handleClientChange = (clientId: string) => {
     console.log('Client changed to:', clientId);
     setSelectedClientId(clientId);
-    fetchTasks();
   };
 
   const handleUserChange = (userId: string) => {
     setSelectedUserId(userId);
+  };
+
+  const handleFilter = () => {
+    if (!startDate || !endDate) {
+      setError('Wybierz zakres dat');
+      return;
+    }
     fetchTasks();
   };
 
@@ -341,6 +342,15 @@ export default function Reports() {
                 </select>
               </div>
             )}
+          </div>
+
+          <div className="mb-6">
+            <button
+              onClick={handleFilter}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Filtruj
+            </button>
           </div>
 
           {error && (

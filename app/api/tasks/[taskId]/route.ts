@@ -3,43 +3,10 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/lib/auth';
 import prisma from '@/app/lib/prisma';
 
-export async function GET(request: Request) {
-  const session = await getServerSession(authOptions);
-
-  if (!session) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  try {
-    const tasks = await prisma.task.findMany({
-      where: {
-        userId: session.user.id,
-        endTime: null,
-      },
-      include: {
-        client: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-      },
-      orderBy: {
-        startTime: 'desc',
-      },
-    });
-
-    return NextResponse.json(tasks);
-  } catch (error) {
-    console.error('Error fetching tasks:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch tasks' },
-      { status: 500 }
-    );
-  }
-}
-
-export async function POST(request: Request) {
+export async function PUT(
+  request: Request,
+  { params }: { params: { taskId: string } }
+) {
   try {
     const session = await getServerSession(authOptions);
 
@@ -54,7 +21,10 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { title, description, startTime, endTime, userId, clientId } = body;
 
-    const task = await prisma.task.create({
+    const task = await prisma.task.update({
+      where: {
+        id: params.taskId,
+      },
       data: {
         title,
         description,
@@ -68,7 +38,35 @@ export async function POST(request: Request) {
 
     return NextResponse.json(task);
   } catch (error) {
-    console.error('Error creating task:', error);
+    console.error('Error updating task:', error);
+    return new NextResponse('Internal Server Error', { status: 500 });
+  }
+}
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: { taskId: string } }
+) {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+      return new NextResponse('Unauthorized', { status: 401 });
+    }
+
+    if (session.user.role !== 'ADMIN') {
+      return new NextResponse('Forbidden', { status: 403 });
+    }
+
+    await prisma.task.delete({
+      where: {
+        id: params.taskId,
+      },
+    });
+
+    return new NextResponse(null, { status: 204 });
+  } catch (error) {
+    console.error('Error deleting task:', error);
     return new NextResponse('Internal Server Error', { status: 500 });
   }
 } 

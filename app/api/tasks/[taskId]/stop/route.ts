@@ -1,13 +1,11 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/auth';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { authOptions } from '@/app/lib/auth';
+import prisma from '@/app/lib/prisma';
 
 export async function POST(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { taskId: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -18,7 +16,7 @@ export async function POST(
 
     const task = await prisma.task.findUnique({
       where: {
-        id: params.id,
+        id: params.taskId,
         userId: session.user.id,
       },
     });
@@ -36,10 +34,11 @@ export async function POST(
 
     const updatedTask = await prisma.task.update({
       where: {
-        id: params.id,
+        id: params.taskId,
       },
       data: {
         endTime: new Date(),
+        duration: new Date().getTime() - new Date(task.startTime).getTime(),
       },
     });
 
