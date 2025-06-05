@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/lib/auth';
-import prisma from '@/app/lib/prisma';
+import { PrismaClient } from '@prisma/client';
+import { authOptions } from '@/app/auth';
+
+const prisma = new PrismaClient();
 
 export async function GET(request: Request) {
   const session = await getServerSession(authOptions);
@@ -14,7 +16,6 @@ export async function GET(request: Request) {
     const tasks = await prisma.task.findMany({
       where: {
         userId: session.user.id,
-        endTime: null,
       },
       include: {
         client: {
@@ -40,19 +41,21 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
-    const session = await getServerSession(authOptions);
+    const { title, description, startTime, endTime, clientId } = await request.json();
 
-    if (!session) {
-      return new NextResponse('Unauthorized', { status: 401 });
+    if (!title || !startTime) {
+      return NextResponse.json(
+        { error: 'Missing required fields' },
+        { status: 400 }
+      );
     }
-
-    if (session.user.role !== 'ADMIN') {
-      return new NextResponse('Forbidden', { status: 403 });
-    }
-
-    const body = await request.json();
-    const { title, description, startTime, endTime, userId, clientId } = body;
 
     const task = await prisma.task.create({
       data: {
@@ -60,15 +63,25 @@ export async function POST(request: Request) {
         description,
         startTime: new Date(startTime),
         endTime: endTime ? new Date(endTime) : null,
-        userId,
-        clientId,
-        duration: endTime ? new Date(endTime).getTime() - new Date(startTime).getTime() : null,
+        userId: session.user.id,
+        clientId: clientId || null,
+      },
+      include: {
+        client: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
     });
 
     return NextResponse.json(task);
   } catch (error) {
     console.error('Error creating task:', error);
-    return new NextResponse('Internal Server Error', { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to create task' },
+      { status: 500 }
+    );
   }
 } 
