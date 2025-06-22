@@ -125,13 +125,13 @@ export default function TasksManagement() {
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (taskId: string) => {
+  const handleDelete = async (id: string) => {
     if (!confirm('Czy na pewno chcesz usunąć to zadanie?')) {
       return;
     }
 
     try {
-      const response = await fetch(`/api/tasks/${taskId}`, {
+      const response = await fetch(`/api/tasks/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

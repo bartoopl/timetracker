@@ -41,9 +41,9 @@ export default function TaskList() {
     router.push('/tasks/new');
   };
 
-  const handleStopTask = async (taskId: string) => {
+  const handleStopTask = async (id: string) => {
     try {
-      const response = await fetch(`/api/tasks/${taskId}/stop`, {
+      const response = await fetch(`/api/tasks/${id}/stop`, {
         method: 'POST',
       });
 

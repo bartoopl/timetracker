@@ -1,7 +1,7 @@
 import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import prisma from './prisma';
-import bcrypt from 'bcryptjs';
+import bcryptjs from 'bcryptjs';
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -26,7 +26,7 @@ export const authOptions: NextAuthOptions = {
           throw new Error('Invalid credentials');
         }
 
-        const isCorrectPassword = await bcrypt.compare(
+        const isCorrectPassword = await bcryptjs.compare(
           credentials.password,
           user.password
         );

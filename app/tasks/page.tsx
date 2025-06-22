@@ -58,9 +58,9 @@ export default function TasksPage() {
     }
   };
 
-  const stopTask = async (taskId: string) => {
+  const stopTask = async (id: string) => {
     try {
-      const response = await fetch(`/api/tasks/${taskId}/stop`, {
+      const response = await fetch(`/api/tasks/${id}/stop`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

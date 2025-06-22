@@ -174,6 +174,17 @@ export default function Reports() {
     return `${hours}h ${minutes}m`;
   };
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('pl-PL', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
   const handleDateChange = (type: 'start' | 'end', value: string) => {
     if (type === 'start') {
       setStartDate(value);
@@ -359,8 +370,18 @@ export default function Reports() {
             </div>
           )}
 
-          <div ref={targetRef}>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <div ref={targetRef} className="print-optimized">
+            {/* Nagłówek raportu */}
+            <div className="bg-white p-6 rounded-lg shadow mb-6 text-center">
+              <h2 className="text-xl font-bold mb-2">
+                Raport dla {selectedClientId ? clients.find(c => c.id === selectedClientId)?.name || 'Wszystkich klientów' : 'Wszystkich klientów'}
+              </h2>
+              <p className="text-gray-600">
+                za pracę w okresie {startDate && endDate ? `${new Date(startDate).toLocaleDateString('pl-PL')} - ${new Date(endDate).toLocaleDateString('pl-PL')}` : 'wszystkich dat'}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 no-print">
               <div className="bg-white p-4 rounded-lg shadow">
                 <h3 className="text-lg font-medium mb-4">Zadania według dnia</h3>
                 <div className="h-80">
@@ -407,48 +428,44 @@ export default function Reports() {
             <div className="bg-white p-4 rounded-lg shadow">
               <h3 className="text-lg font-medium mb-4">Lista zadań</h3>
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
+                <table className="min-w-full divide-y divide-gray-200 text-xs">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/5">
                         Tytuł
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/5">
                         Klient
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/5">
                         Użytkownik
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Data rozpoczęcia
+                      <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/5">
+                        Data
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Data zakończenia
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Czas trwania
+                      <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/5">
+                        Czas
                       </th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {tasks.map((task) => (
-                      <tr key={task.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {task.title}
+                      <tr key={task.id} className="page-break-inside-avoid">
+                        <td className="px-2 py-2 text-xs text-gray-900 align-top">
+                          <div className="max-w-xs break-words">
+                            {task.title}
+                          </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="px-2 py-2 text-xs text-gray-500 align-top">
                           {task.client?.name || '-'}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="px-2 py-2 text-xs text-gray-500 align-top">
                           {task.user.name}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {new Date(task.startTime).toLocaleString('pl-PL')}
+                        <td className="px-2 py-2 text-xs text-gray-500 align-top">
+                          {formatDate(task.startTime)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {task.endTime ? new Date(task.endTime).toLocaleString('pl-PL') : '-'}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="px-2 py-2 text-xs text-gray-500 align-top">
                           {formatDuration(task.duration)}
                         </td>
                       </tr>

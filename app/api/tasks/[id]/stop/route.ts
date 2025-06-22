@@ -4,21 +4,18 @@ import { authOptions } from '@/app/lib/auth';
 import prisma from '@/app/lib/prisma';
 
 export async function POST(
-  req: Request,
-  { params }: { params: { taskId: string } }
+  request: Request,
+  { params }: { params: { id: string } }
 ) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const task = await prisma.task.findUnique({
-      where: {
-        id: params.taskId,
-        userId: session.user.id,
-      },
+      where: { id: params.id },
     });
 
     if (!task) {
@@ -27,26 +24,27 @@ export async function POST(
 
     if (task.endTime) {
       return NextResponse.json(
-        { error: 'Task is already completed' },
+        { error: 'Task is already stopped' },
         { status: 400 }
       );
     }
 
+    const endTime = new Date();
+    const duration = endTime.getTime() - task.startTime.getTime();
+
     const updatedTask = await prisma.task.update({
-      where: {
-        id: params.taskId,
-      },
+      where: { id: params.id },
       data: {
-        endTime: new Date(),
-        duration: new Date().getTime() - new Date(task.startTime).getTime(),
+        endTime,
+        duration,
       },
     });
 
     return NextResponse.json(updatedTask);
   } catch (error) {
-    console.error('Błąd podczas zatrzymywania zadania:', error);
+    console.error('Error stopping task:', error);
     return NextResponse.json(
-      { error: 'Wystąpił błąd podczas zatrzymywania zadania' },
+      { error: 'Failed to stop task' },
       { status: 500 }
     );
   }

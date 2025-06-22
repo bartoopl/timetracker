@@ -10,4 +10,104 @@
 body {
   color: rgb(var(--foreground-rgb));
   background: rgb(var(--background-rgb));
+}
+
+/* Style dla eksportu PDF */
+.print-optimized {
+  max-width: 210mm; /* Szerokość A4 */
+  margin: 0 auto;
+}
+
+.print-optimized table {
+  font-size: 10px;
+  line-height: 1.4; /* Zwiększony line-height dla czytelności */
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.print-optimized th,
+.print-optimized td {
+  padding: 6px 8px; /* Zwiększony padding */
+  border: 1px solid #e5e7eb;
+  vertical-align: top;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.print-optimized th {
+  background-color: #f9fafb;
+  font-weight: 600;
+}
+
+.print-optimized .recharts-wrapper {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Zapobieganie podziałom stron w wierszach tabeli */
+.print-optimized tr {
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+}
+
+/* Zapobieganie podziałom stron w komórkach */
+.print-optimized td {
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+}
+
+/* Maksymalna wysokość komórki z tytułem */
+.print-optimized td:first-child {
+  max-height: 60px;
+  overflow: hidden;
+}
+
+.print-optimized td:first-child div {
+  max-height: 60px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-optimized {
+    width: 100%;
+    max-width: none;
+  }
+  
+  .print-optimized table {
+    font-size: 9px; /* Nieco większa czcionka w druku */
+  }
+  
+  .print-optimized th,
+  .print-optimized td {
+    padding: 4px 6px;
+  }
+  
+  /* Wymuszenie podziału strony przed tabelą jeśli jest za duża */
+  .print-optimized table {
+    page-break-before: auto;
+    page-break-after: auto;
+  }
+  
+  /* Zapobieganie podziałom w wierszach */
+  .print-optimized tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+  
+  /* Maksymalna wysokość komórki w druku */
+  .print-optimized td:first-child {
+    max-height: 40px;
+  }
+  
+  .print-optimized td:first-child div {
+    max-height: 40px;
+    -webkit-line-clamp: 2;
+  }
 } 
