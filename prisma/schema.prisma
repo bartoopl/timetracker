@@ -49,6 +49,8 @@ model User {
   sessions      Session[]
   tasks         Task[]
   clients       UserClient[]
+  organizationId String?
+  organization  Organization? @relation(fields: [organizationId], references: [id])
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
@@ -64,6 +66,8 @@ model Task {
   clientId    String?
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   client      Client?   @relation(fields: [clientId], references: [id])
+  organizationId String?
+  organization  Organization? @relation(fields: [organizationId], references: [id])
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 }
@@ -76,6 +80,8 @@ model Client {
   address   String?
   tasks     Task[]
   users     UserClient[]
+  organizationId String?
+  organization  Organization? @relation(fields: [organizationId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -90,4 +96,14 @@ model UserClient {
   updatedAt DateTime @updatedAt
 
   @@unique([userId, clientId])
+}
+
+model Organization {
+  id      String   @id @default(cuid())
+  name    String
+  users   User[]
+  clients Client[]
+  tasks   Task[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
