@@ -5,8 +5,9 @@ import prisma from '@/app/lib/prisma';
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const session = await getServerSession(authOptions);
 
   if (!session) {
@@ -15,7 +16,7 @@ export async function POST(
 
   try {
     const task = await prisma.task.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!task) {
@@ -33,7 +34,7 @@ export async function POST(
     const duration = endTime.getTime() - task.startTime.getTime();
 
     const updatedTask = await prisma.task.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         endTime,
         duration,

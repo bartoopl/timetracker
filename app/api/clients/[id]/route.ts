@@ -7,8 +7,9 @@ const prisma = new PrismaClient();
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const session = await getServerSession(authOptions);
 
   if (!session || session.user.role !== 'ADMIN') {
@@ -17,7 +18,7 @@ export async function GET(
 
   try {
     const client = await prisma.client.findUnique({
-      where: { id: params.id },
+      where: { id },
       select: {
         id: true,
         name: true,
@@ -44,8 +45,9 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const session = await getServerSession(authOptions);
 
   if (!session || session.user.role !== 'ADMIN') {
@@ -66,7 +68,7 @@ export async function PUT(
     const existingClient = await prisma.client.findFirst({
       where: {
         email,
-        id: { not: params.id },
+        id: { not: id },
       },
     });
 
@@ -78,7 +80,7 @@ export async function PUT(
     }
 
     const client = await prisma.client.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         name,
         email,
@@ -106,8 +108,9 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const session = await getServerSession(authOptions);
 
   if (!session || session.user.role !== 'ADMIN') {
@@ -116,7 +119,7 @@ export async function DELETE(
 
   try {
     await prisma.client.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ success: true });

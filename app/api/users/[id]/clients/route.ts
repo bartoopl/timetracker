@@ -16,8 +16,9 @@ interface UserClient {
 // Pobierz klientów przypisanych do użytkownika
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const session = await getServerSession(authOptions);
 
   if (!session) {
@@ -37,7 +38,7 @@ export async function GET(
   try {
     const userClients = await prisma.userClient.findMany({
       where: {
-        userId: params.id,
+        userId: id,
       },
       include: {
         client: {
@@ -66,8 +67,9 @@ export async function GET(
 // Przypisz klientów do użytkownika
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const session = await getServerSession(authOptions);
 
   if (!session) {
@@ -90,7 +92,7 @@ export async function POST(
     // Usuń wszystkie istniejące uprawnienia
     await prisma.userClient.deleteMany({
       where: {
-        userId: params.id,
+        userId: id,
       },
     });
 
@@ -98,7 +100,7 @@ export async function POST(
     if (clientIds && clientIds.length > 0) {
       await prisma.userClient.createMany({
         data: clientIds.map((clientId: string) => ({
-          userId: params.id,
+          userId: id,
           clientId,
         })),
       });
