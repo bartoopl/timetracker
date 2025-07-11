@@ -397,9 +397,7 @@ export default function Reports() {
                       <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/5">
                         Klient
                       </th>
-                      <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/5">
-                        Użytkownik
-                      </th>
+                      {/* Usunięto kolumnę Użytkownik */}
                       <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/5">
                         Data
                       </th>
@@ -415,9 +413,7 @@ export default function Reports() {
                         <td className="px-2 py-2 text-xs text-gray-500 align-top">
                           {task.client?.name || '-'}
                         </td>
-                        <td className="px-2 py-2 text-xs text-gray-500 align-top">
-                          {task.user.name}
-                        </td>
+                        {/* Usunięto komórkę z użytkownikiem */}
                         <td className="px-2 py-2 text-xs text-gray-500 align-top">
                           {formatDate(task.startTime)}
                         </td>
