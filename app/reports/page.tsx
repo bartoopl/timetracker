@@ -409,10 +409,8 @@ export default function Reports() {
                   <tbody className="bg-white divide-y divide-gray-200">
                     {tasks.map((task) => (
                       <tr key={task.id} className="page-break-inside-avoid">
-                        <td className="px-2 py-2 text-xs text-gray-900 align-top">
-                          <div className="max-w-xs break-words whitespace-pre-line" style={{wordBreak: 'break-word'}}>
-                            {task.title}
-                          </div>
+                        <td className="px-2 py-2 text-xs text-gray-900 align-top" style={{ wordBreak: 'break-word', whiteSpace: 'normal', overflowWrap: 'anywhere' }}>
+                          {task.title}
                         </td>
                         <td className="px-2 py-2 text-xs text-gray-500 align-top">
                           {task.client?.name || '-'}
