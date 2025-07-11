@@ -381,52 +381,12 @@ export default function Reports() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 no-print">
-              <div className="bg-white p-4 rounded-lg shadow">
-                <h3 className="text-lg font-medium mb-4">Zadania według dnia</h3>
-                <div className="h-80">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={stats.tasksByDay}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="date" />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
-                      <Bar dataKey="count" fill="#3B82F6" name="Liczba zadań" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-
-              <div className="bg-white p-4 rounded-lg shadow">
-                <h3 className="text-lg font-medium mb-4">Zadania według użytkownika</h3>
-                <div className="h-80">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={stats.tasksByUser}
-                        dataKey="count"
-                        nameKey="user"
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={80}
-                        fill="#8884d8"
-                        label
-                      >
-                        {stats.tasksByUser.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={`hsl(${index * 45}, 70%, 50%)`} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                      <Legend />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            </div>
+            {/* USUNIĘTO wykresy z PDF (były tu) */}
 
             <div className="bg-white p-4 rounded-lg shadow">
-              <h3 className="text-lg font-medium mb-4">Lista zadań</h3>
+              <h3 className="text-lg font-medium mb-4">
+                Lista zadań ({tasks.filter(t => t.endTime).length})
+              </h3>
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200 text-xs">
                   <thead className="bg-gray-50">
@@ -443,16 +403,14 @@ export default function Reports() {
                       <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/5">
                         Data
                       </th>
-                      <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/5">
-                        Czas
-                      </th>
+                      {/* Usunięto kolumnę Czas */}
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {tasks.map((task) => (
                       <tr key={task.id} className="page-break-inside-avoid">
                         <td className="px-2 py-2 text-xs text-gray-900 align-top">
-                          <div className="max-w-xs break-words">
+                          <div className="max-w-xs break-words whitespace-pre-line" style={{wordBreak: 'break-word'}}>
                             {task.title}
                           </div>
                         </td>
@@ -465,9 +423,7 @@ export default function Reports() {
                         <td className="px-2 py-2 text-xs text-gray-500 align-top">
                           {formatDate(task.startTime)}
                         </td>
-                        <td className="px-2 py-2 text-xs text-gray-500 align-top">
-                          {formatDuration(task.duration)}
-                        </td>
+                        {/* Usunięto komórkę z czasem */}
                       </tr>
                     ))}
                   </tbody>
