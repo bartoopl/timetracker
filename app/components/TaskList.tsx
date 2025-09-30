@@ -74,54 +74,87 @@ export default function TaskList() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900">Your Tasks</h2>
+        <div>
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+            Twoje zadania
+          </h2>
+          <p className="text-gray-600 mt-1">Śledź swój czas pracy</p>
+        </div>
         <button
           onClick={handleStartTask}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+          className="bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white px-5 py-2.5 rounded-lg font-medium transition-all duration-150 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
         >
-          Start New Task
+          + Nowe zadanie
         </button>
       </div>
 
       {tasks.length === 0 ? (
-        <p className="text-gray-600 text-center py-8">No tasks yet. Start your first task!</p>
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-12 text-center border border-gray-100">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary-100 to-secondary-100 rounded-full mb-4">
+            <svg className="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+          </div>
+          <p className="text-gray-600 text-lg">Brak zadań. Rozpocznij pierwsze zadanie!</p>
+        </div>
       ) : (
-        <div className="space-y-4">
+        <div className="grid gap-4">
           {tasks.map((task) => (
             <div
               key={task.id}
-              className="bg-white p-4 rounded-lg shadow-sm border border-gray-200"
+              className="bg-white/80 backdrop-blur-sm p-5 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-all duration-150"
             >
               <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-medium text-gray-900">{task.title}</h3>
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <h3 className="font-semibold text-gray-900 text-lg">{task.title}</h3>
+                    {!task.endTime && (
+                      <span className="flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-accent-100 to-accent-200 text-accent-800 rounded-full text-xs font-semibold">
+                        <span className="w-2 h-2 bg-accent-500 rounded-full animate-pulse"></span>
+                        W trakcie
+                      </span>
+                    )}
+                  </div>
                   {task.description && (
-                    <p className="text-gray-600 mt-1">{task.description}</p>
+                    <p className="text-gray-600 mb-3">{task.description}</p>
                   )}
                   {task.client && (
-                    <p className="text-sm text-gray-500 mt-1">
-                      Client: {task.client.name}
-                    </p>
+                    <div className="inline-flex items-center gap-1 mb-3">
+                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                      <span className="text-sm text-gray-600">
+                        {task.client.name}
+                      </span>
+                    </div>
                   )}
-                  <div className="text-sm text-gray-500 mt-2">
-                    <p>
-                      Started:{' '}
-                      {new Date(task.startTime).toLocaleString()}
-                    </p>
+                  <div className="flex gap-4 text-sm text-gray-500">
+                    <div className="flex items-center gap-1">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span>
+                        Rozpoczęto: {new Date(task.startTime).toLocaleString('pl-PL')}
+                      </span>
+                    </div>
                     {task.endTime && (
-                      <p>
-                        Ended:{' '}
-                        {new Date(task.endTime).toLocaleString()}
-                      </p>
+                      <div className="flex items-center gap-1">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>
+                          Zakończono: {new Date(task.endTime).toLocaleString('pl-PL')}
+                        </span>
+                      </div>
                     )}
                   </div>
                 </div>
                 {!task.endTime && (
                   <button
                     onClick={() => handleStopTask(task.id)}
-                    className="bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700 transition-colors text-sm"
+                    className="ml-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm shadow-md hover:shadow-lg"
                   >
-                    Stop
+                    Zakończ
                   </button>
                 )}
               </div>
